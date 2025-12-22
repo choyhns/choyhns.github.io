@@ -1,6 +1,8 @@
 export default function ProjectCard({ p }) {
   const { title, subtitle, tags, period, highlights, links } = p;
 
+  const preview = highlights.slice(0, 2);
+
   return (
     <article className="card">
       <div className="card-top">
@@ -20,7 +22,7 @@ export default function ProjectCard({ p }) {
       </div>
 
       <ul className="bullets">
-        {highlights.map((h) => (
+        {preview.map((h) => (
           <li key={h}>{h}</li>
         ))}
       </ul>

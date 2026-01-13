@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import Section from "./Section.jsx";
 import { projects } from "../data/projects.js";
 
@@ -17,7 +18,6 @@ export default function ProjectTabs() {
       title="Projects"
       desc="탭을 선택하면 대표 화면과 핵심 기능 요약을 확인할 수 있습니다."
     >
-      {/* Tabs */}
       <div className="tabs">
         {tabs.map((p) => (
           <button
@@ -30,14 +30,11 @@ export default function ProjectTabs() {
         ))}
       </div>
 
-      {/* Content */}
       <div className="project-panel">
-        {/* left: screenshot */}
         <div className="card project-shot">
           <img src={current.screenshot} alt={`${current.title} screenshot`} />
         </div>
 
-        {/* right: info */}
         <div className="card project-info">
           <div className="project-title-row">
             <div>
@@ -48,9 +45,7 @@ export default function ProjectTabs() {
 
           <div className="tag-row">
             {current.stack.map((t) => (
-              <span className="tag" key={t}>
-                {t}
-              </span>
+              <span className="tag" key={t}>{t}</span>
             ))}
           </div>
 
@@ -61,19 +56,19 @@ export default function ProjectTabs() {
           </ul>
 
           <div className="card-actions">
+            {/* ✅ 상세 페이지로 이동 */}
+            <Link className="btn small" to={`/project/${current.slug}`}>
+              Detail
+            </Link>
+
             {current.links.repo ? (
-              <a className="btn small" href={current.links.repo} target="_blank" rel="noreferrer">
+              <a className="btn small ghost" href={current.links.repo} target="_blank" rel="noreferrer">
                 Repo
               </a>
             ) : null}
             {current.links.demo ? (
               <a className="btn small ghost" href={current.links.demo} target="_blank" rel="noreferrer">
                 Demo
-              </a>
-            ) : null}
-            {current.links.docs ? (
-              <a className="btn small ghost" href={current.links.docs} target="_blank" rel="noreferrer">
-                Docs
               </a>
             ) : null}
           </div>

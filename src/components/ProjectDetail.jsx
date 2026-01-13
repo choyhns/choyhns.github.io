@@ -1,78 +1,260 @@
-import { useMemo } from "react";
+// src/components/ProjectDetail.jsx
+import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { projects } from "../data/projects.js";
 
 export default function ProjectDetail() {
   const { slug } = useParams();
+  const [onlyMine, setOnlyMine] = useState(false);
 
-  const project = useMemo(
-    () => projects.find((p) => p.slug === slug),
-    [slug]
-  );
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [slug]);
+
+  const project = useMemo(() => projects.find((p) => p.slug === slug), [slug]);
+
+  const nav = useMemo(() => {
+    const idx = projects.findIndex((p) => p.slug === slug);
+    const prev = idx > 0 ? projects[idx - 1] : null;
+    const next = idx >= 0 && idx < projects.length - 1 ? projects[idx + 1] : null;
+    return { prev, next };
+  }, [slug]);
+
+  const myKeywords = useMemo(() => {
+    if (!project) return [];
+    return Array.isArray(project.myScreensKeywords) ? project.myScreensKeywords : [];
+  }, [project]);
+
+  const screensComputed = useMemo(() => {
+    const all = project?.screens ?? [];
+    if (!all.length) return { ordered: [], mine: [] };
+    if (!myKeywords.length) return { ordered: all, mine: [] };
+
+    const mine = all.filter((s) => myKeywords.some((k) => (s.caption || "").includes(k)));
+    const rest = all.filter((s) => !myKeywords.some((k) => (s.caption || "").includes(k)));
+    return { ordered: [...mine, ...rest], mine };
+  }, [project, myKeywords]);
+
+  const screensToShow = useMemo(() => {
+    if (!project?.screens?.length) return [];
+    if (!myKeywords.length) return screensComputed.ordered;
+    return onlyMine ? screensComputed.mine : screensComputed.ordered;
+  }, [project, myKeywords, onlyMine, screensComputed]);
 
   if (!project) {
     return (
-      <div className="card">
-        <h2>프로젝트를 찾을 수 없어요.</h2>
-        <Link className="btn small" to="/">홈으로</Link>
-      </div>
+      <section className="section">
+        <div className="container">
+          <div className="card">
+            <h2>프로젝트를 찾을 수 없어요.</h2>
+            <p className="muted">URL이 잘못되었거나 프로젝트 데이터가 없을 수 있어요.</p>
+            <div className="card-actions">
+              <Link className="btn" to="/">
+                홈으로
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
     );
   }
 
+  const links = project.links || {};
+  const hasLinks = Boolean(links.repo || links.demo || links.docs);
+
   return (
-    <section className="section">
-      <div className="section-head" style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-        <div>
-          <h2 style={{ margin: 0 }}>{project.title}</h2>
-          <p className="section-desc" style={{ marginTop: 6 }}>{project.subtitle}</p>
-        </div>
-        <Link className="btn ghost small" to="/">← Home</Link>
-      </div>
+    <section className="section project-detail">
+      <div className="container">
+        {/* Top bar */}
+        <div className="detail-topbar">
+          <Link className="btn ghost" to="/#projects">
+            ← Projects
+          </Link>
 
-      <div className="tag-row">
-        {project.tags.map((t) => (
-          <span className="tag" key={t}>{t}</span>
-        ))}
-      </div>
-
-      <div className="card" style={{ marginTop: 14 }}>
-        <h3 style={{ marginTop: 0 }}>내 역할 / 핵심 기여</h3>
-        <ul className="bullets">
-          {project.highlights.map((h) => <li key={h}>{h}</li>)}
-        </ul>
-
-        <div className="card-actions" style={{ marginTop: 12 }}>
-          {project.links.repo && <a className="btn small" href={project.links.repo} target="_blank" rel="noreferrer">Repo</a>}
-          {project.links.demo && <a className="btn small ghost" href={project.links.demo} target="_blank" rel="noreferrer">Demo</a>}
-          {project.links.docs && <a className="btn small ghost" href={project.links.docs} target="_blank" rel="noreferrer">Docs</a>}
-        </div>
-      </div>
-
-      <div className="detail-grid" style={{ marginTop: 14 }}>
-        <div className="card">
-          <h3 style={{ marginTop: 0 }}>UI 스크린샷</h3>
-          <div className="shot-grid">
-            {project.screens?.map((s) => (
-              <figure key={s.src} className="shot">
-                <img src={s.src} alt={s.alt || "screenshot"} />
-                <figcaption className="muted">{s.caption}</figcaption>
-              </figure>
-            ))}
-            {!project.screens?.length && <p className="muted">스크린샷을 추가해 주세요.</p>}
+          <div className="detail-nav">
+            {nav.prev ? (
+              <Link className="btn small ghost" to={`/project/${nav.prev.slug}`}>
+                ← {nav.prev.title}
+              </Link>
+            ) : (
+              <span />
+            )}
+            {nav.next ? (
+              <Link className="btn small ghost" to={`/project/${nav.next.slug}`}>
+                {nav.next.title} →
+              </Link>
+            ) : (
+              <span />
+            )}
           </div>
         </div>
 
+        {/* Header */}
         <div className="card">
-          <h3 style={{ marginTop: 0 }}>기능 설명</h3>
-          <ol className="steps">
-            {project.features?.map((f) => (
-              <li key={f.title}>
-                <div className="step-title">{f.title}</div>
-                <div className="muted">{f.desc}</div>
-              </li>
-            ))}
-            {!project.features?.length && <p className="muted">기능 설명을 추가해 주세요.</p>}
-          </ol>
+          <div className="detail-header">
+            <div className="detail-head-left">
+              <h1 className="project-title">{project.title}</h1>
+              <p className="project-sub">{project.subtitle}</p>
+
+              {project.highlights?.length ? (
+                <p className="muted" style={{ marginTop: 8 }}>
+                  <b>My Role:</b> {project.highlights[0]}
+                </p>
+              ) : null}
+
+              <div className="tag-row" style={{ marginTop: 10, flexWrap: "wrap" }}>
+                {(project.tags || []).map((t) => (
+                  <span className="tag" key={t}>
+                    {t}
+                  </span>
+                ))}
+              </div>
+
+              {project.stack?.length ? (
+                <div className="muted" style={{ marginTop: 10 }}>
+                  <b>Stack:</b> {project.stack.join(" · ")}
+                </div>
+              ) : null}
+            </div>
+
+            <div className="detail-head-right">
+              {project.screenshot ? (
+                <div className="detail-hero-shot">
+                  <img src={project.screenshot} alt={`${project.title} 대표 화면`} />
+                </div>
+              ) : (
+                <div className="detail-hero-shot muted">대표 이미지를 추가해 주세요.</div>
+              )}
+            </div>
+          </div>
+
+          {hasLinks ? (
+            <div className="card-actions" style={{ marginTop: 12 }}>
+              {links.repo ? (
+                <a className="btn small" href={links.repo} target="_blank" rel="noreferrer">
+                  Repo
+                </a>
+              ) : null}
+              {links.demo ? (
+                <a className="btn small" href={links.demo} target="_blank" rel="noreferrer">
+                  Demo
+                </a>
+              ) : null}
+              {links.docs ? (
+                <a className="btn small ghost" href={links.docs} target="_blank" rel="noreferrer">
+                  Docs
+                </a>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+
+        {/* Overview / Highlights */}
+        <div className="grid-2" style={{ marginTop: 18 }}>
+          <div className="card">
+            <h3 className="card-title">Overview</h3>
+            {project.summary?.length ? (
+              <ul className="bullets">
+                {project.summary.map((s) => (
+                  <li key={s}>{s}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="muted">summary를 추가해 주세요.</p>
+            )}
+          </div>
+
+          <div className="card">
+            <h3 className="card-title">Highlights</h3>
+            {project.highlights?.length ? (
+              <ul className="bullets">
+                {project.highlights.map((h) => (
+                  <li key={h}>{h}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="muted">highlights를 추가해 주세요.</p>
+            )}
+          </div>
+        </div>
+
+        {/* My Contributions */}
+        <div className="card" style={{ marginTop: 18 }}>
+          <h3 className="card-title">My Contributions</h3>
+          <p className="muted" style={{ marginTop: 4 }}>
+            내가 담당한 기능을 중심으로 정리했습니다.
+          </p>
+
+          {project.features?.length ? (
+            <ol className="steps" style={{ marginTop: 10 }}>
+              {project.features.map((f) => (
+                <li key={f.title}>
+                  <div className="step-title">{f.title}</div>
+                  <div className="muted">{f.desc}</div>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="muted">features를 추가해 주세요.</p>
+          )}
+        </div>
+
+        {/* Screens */}
+        <div className="card" style={{ marginTop: 18 }}>
+          <div className="row-between" style={{ alignItems: "center" }}>
+            <div>
+              <h3 className="card-title">Screens</h3>
+              <p className="muted" style={{ marginTop: 4 }}>
+                화면 캡처 기반으로 사용자 흐름을 정리했습니다.
+              </p>
+            </div>
+
+            {myKeywords.length ? (
+              <label className="muted" style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <input
+                  type="checkbox"
+                  checked={onlyMine}
+                  onChange={(e) => setOnlyMine(e.target.checked)}
+                />
+                내 담당 화면만 보기
+              </label>
+            ) : null}
+          </div>
+
+          {screensToShow.length ? (
+            <div className="screens-grid" style={{ marginTop: 12 }}>
+              {screensToShow.map((s) => (
+                <figure key={s.src} className="screen">
+                  <img src={s.src} alt={s.alt || s.caption || "screen"} loading="lazy" />
+                  <figcaption>
+                    <b>{s.caption}</b>
+                    {s.detail ? <p className="muted">{s.detail}</p> : null}
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          ) : (
+            <p className="muted">screens를 추가해 주세요.</p>
+          )}
+        </div>
+
+        {/* Bottom nav */}
+        <div className="detail-bottom-nav" style={{ marginTop: 18 }}>
+          <Link className="btn ghost" to="/#projects">
+            ← 목록으로
+          </Link>
+          <div className="detail-nav">
+            {nav.prev ? (
+              <Link className="btn small ghost" to={`/project/${nav.prev.slug}`}>
+                ← {nav.prev.title}
+              </Link>
+            ) : null}
+            {nav.next ? (
+              <Link className="btn small" to={`/project/${nav.next.slug}`}>
+                Next: {nav.next.title} →
+              </Link>
+            ) : null}
+          </div>
         </div>
       </div>
     </section>

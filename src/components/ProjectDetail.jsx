@@ -7,29 +7,11 @@ export default function ProjectDetail() {
   const { slug } = useParams();
   const [onlyMine, setOnlyMine] = useState(false);
 
-  // ✅ slider refs / handlers
+  // ✅ 한 장 슬라이드 인덱스
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  // (선택) 트랙 ref 유지: 버튼/도트 클릭 시 scrollIntoView로 움직이게
   const sliderRef = useRef(null);
-
-  const scrollByCard = (dir) => {
-    const el = sliderRef.current;
-    if (!el) return;
-
-    const card = el.querySelector(".shot-slide");
-    const w = card ? card.getBoundingClientRect().width : 420;
-
-    el.scrollBy({ left: dir * (w + 16), behavior: "smooth" });
-  };
-
-  const goToIndex = (idx) => {
-    const el = sliderRef.current;
-    if (!el) return;
-
-    const slides = el.querySelectorAll(".shot-slide");
-    const target = slides[idx];
-    if (target) {
-      target.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
-    }
-  };
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -65,6 +47,29 @@ export default function ProjectDetail() {
     return onlyMine ? screensComputed.mine : screensComputed.ordered;
   }, [project, myKeywords, onlyMine, screensComputed]);
 
+  // ✅ 토글/프로젝트 변경 시 인덱스 초기화
+  useEffect(() => {
+    setActiveIdx(0);
+  }, [slug, onlyMine]);
+
+  // ✅ activeIdx를 트랙에 반영(한 장씩 스냅)
+  useEffect(() => {
+    const el = sliderRef.current;
+    if (!el) return;
+    const slides = el.querySelectorAll(".shot-slide");
+    const target = slides[activeIdx];
+    if (target) target.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+  }, [activeIdx]);
+
+  const clampIndex = (i) => {
+    const max = Math.max(0, screensToShow.length - 1);
+    return Math.min(Math.max(i, 0), max);
+  };
+
+  const prevSlide = () => setActiveIdx((i) => clampIndex(i - 1));
+  const nextSlide = () => setActiveIdx((i) => clampIndex(i + 1));
+  const goToIndex = (i) => setActiveIdx(clampIndex(i));
+
   if (!project) {
     return (
       <section className="section">
@@ -85,6 +90,8 @@ export default function ProjectDetail() {
 
   const links = project.links || {};
   const hasLinks = Boolean(links.repo || links.demo || links.docs);
+
+  const currentSlide = screensToShow[activeIdx];
 
   return (
     <section className="section project-detail">
@@ -141,14 +148,15 @@ export default function ProjectDetail() {
               ) : null}
             </div>
 
+            {/* ✅ 카드 크기에 맞는 hero 이미지 박스 */}
             <div className="detail-head-right">
-              {project.screenshot ? (
-                <div className="detail-hero-shot">
+              <div className="detail-hero-shot detail-hero-fit">
+                {project.screenshot ? (
                   <img src={project.screenshot} alt={`${project.title} 대표 화면`} />
-                </div>
-              ) : (
-                <div className="detail-hero-shot muted">대표 이미지를 추가해 주세요.</div>
-              )}
+                ) : (
+                  <div className="muted">대표 이미지를 추가해 주세요.</div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -223,13 +231,13 @@ export default function ProjectDetail() {
           )}
         </div>
 
-        {/* Screens (Slider) */}
+        {/* ✅ Screens (1장씩 슬라이드) */}
         <div className="card" style={{ marginTop: 18 }}>
           <div className="row-between" style={{ alignItems: "center" }}>
             <div>
               <h3 className="card-title">Screens</h3>
               <p className="muted" style={{ marginTop: 4 }}>
-                카드 슬라이드로 화면과 설명을 빠르게 확인할 수 있습니다.
+                이미지 1장 + 설명 1개씩 넘기며 확인할 수 있습니다.
               </p>
             </div>
 
@@ -239,63 +247,73 @@ export default function ProjectDetail() {
                   <input
                     type="checkbox"
                     checked={onlyMine}
-                    onChange={(e) => {
-                      setOnlyMine(e.target.checked);
-                      // 토글 시 첫 카드로 이동(선택)
-                      setTimeout(() => goToIndex(0), 0);
-                    }}
+                    onChange={(e) => setOnlyMine(e.target.checked)}
                   />
                   내 담당만
                 </label>
               ) : null}
 
-              <button className="btn small ghost" onClick={() => scrollByCard(-1)} aria-label="prev">
+              <button
+                className="btn small ghost"
+                onClick={prevSlide}
+                disabled={activeIdx <= 0}
+                aria-label="prev"
+              >
                 ←
               </button>
-              <button className="btn small ghost" onClick={() => scrollByCard(1)} aria-label="next">
+
+              <div className="shot-counter muted">
+                {screensToShow.length ? `${activeIdx + 1} / ${screensToShow.length}` : "0 / 0"}
+              </div>
+
+              <button
+                className="btn small ghost"
+                onClick={nextSlide}
+                disabled={activeIdx >= screensToShow.length - 1}
+                aria-label="next"
+              >
                 →
               </button>
             </div>
           </div>
 
-          {screensToShow.length ? (
+          {!screensToShow.length ? (
+            <p className="muted">screens를 추가해 주세요.</p>
+          ) : (
             <>
-              <div className="shot-track" ref={sliderRef}>
+              {/* 트랙은 “한 장씩” 보이도록 columns = 100% */}
+              <div className="shot-track-one" ref={sliderRef}>
                 {screensToShow.map((s, idx) => (
-                  <article className="shot-slide" key={s.src}>
-                    <div className="shot-img">
+                  <article className="shot-slide-one" key={s.src}>
+                    <div className="shot-img-one">
                       <img src={s.src} alt={s.alt || s.caption || "screen"} loading="lazy" />
                     </div>
 
-                    <div className="shot-body">
+                    <div className="shot-body-one">
                       <div className="shot-topline">
                         <span className="shot-index">{String(idx + 1).padStart(2, "0")}</span>
                         <h4 className="shot-title">{s.caption}</h4>
                       </div>
-
-                      {s.detail ? (
-                        <p className="shot-desc">{s.detail}</p>
-                      ) : (
-                        <p className="shot-desc muted">설명(detail)을 추가하면 여기에 표시됩니다.</p>
-                      )}
+                      <p className="shot-desc">
+                        {s.detail ? s.detail : "설명(detail)을 추가하면 여기에 표시됩니다."}
+                      </p>
                     </div>
                   </article>
                 ))}
               </div>
 
+              {/* dots */}
               <div className="shot-dots">
                 {screensToShow.map((_, i) => (
                   <button
                     key={i}
-                    className="shot-dot"
+                    className={`shot-dot ${i === activeIdx ? "active" : ""}`}
                     onClick={() => goToIndex(i)}
                     aria-label={`go to slide ${i + 1}`}
                   />
                 ))}
               </div>
             </>
-          ) : (
-            <p className="muted">screens를 추가해 주세요.</p>
           )}
         </div>
 

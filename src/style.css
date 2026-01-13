@@ -314,3 +314,5 @@ button{ font: inherit; color: inherit; background: none; border: none; cursor: p
     grid-template-columns: 1fr;
   }
 }
+
+.card-thumb img { width:100%; height:auto; }

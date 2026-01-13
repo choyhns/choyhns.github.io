@@ -1,5 +1,5 @@
 // src/data/projects.js
-import { screensBySlug } from "./ProjectImage";
+import { screensBySlug } from "./ProjectImages";
 
 // -----------------------------
 // helpers

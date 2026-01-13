@@ -50,7 +50,7 @@ export default function ProjectDetail() {
   // ✅ 토글/프로젝트 변경 시 인덱스 초기화
   useEffect(() => {
     setActiveIdx(0);
-  }, [slug, onlyMine]);
+  }, [slug, onlyMine, screensToShow.length]);
 
   // ✅ activeIdx를 트랙에 반영(한 장씩 스냅)
   useEffect(() => {
@@ -231,7 +231,7 @@ export default function ProjectDetail() {
           )}
         </div>
 
-        {/* ✅ Screens (1장씩 슬라이드) */}
+        {/* ✅ Screens (state 기반 1장 슬라이더) */}
         <div className="card" style={{ marginTop: 18 }}>
           <div className="row-between" style={{ alignItems: "center" }}>
             <div>
@@ -255,9 +255,8 @@ export default function ProjectDetail() {
 
               <button
                 className="btn small ghost"
-                onClick={prevSlide}
+                onClick={() => setActiveIdx((i) => Math.max(0, i - 1))}
                 disabled={activeIdx <= 0}
-                aria-label="prev"
               >
                 ←
               </button>
@@ -268,9 +267,8 @@ export default function ProjectDetail() {
 
               <button
                 className="btn small ghost"
-                onClick={nextSlide}
+                onClick={() => setActiveIdx((i) => Math.min(screensToShow.length - 1, i + 1))}
                 disabled={activeIdx >= screensToShow.length - 1}
-                aria-label="next"
               >
                 →
               </button>
@@ -281,34 +279,38 @@ export default function ProjectDetail() {
             <p className="muted">screens를 추가해 주세요.</p>
           ) : (
             <>
-              {/* 트랙은 “한 장씩” 보이도록 columns = 100% */}
-              <div className="shot-track-one" ref={sliderRef}>
-                {screensToShow.map((s, idx) => (
-                  <article className="shot-slide-one" key={s.src}>
-                    <div className="shot-img-one">
-                      <img src={s.src} alt={s.alt || s.caption || "screen"} loading="lazy" />
-                    </div>
+              {/* ✅ 여기서 “1장만” 렌더링 */}
+              <article className="shot-single">
+                <div className="shot-img-one">
+                  <img
+                    src={screensToShow[activeIdx].src}
+                    alt={screensToShow[activeIdx].alt || screensToShow[activeIdx].caption || "screen"}
+                    loading="lazy"
+                  />
+                </div>
 
-                    <div className="shot-body-one">
-                      <div className="shot-topline">
-                        <span className="shot-index">{String(idx + 1).padStart(2, "0")}</span>
-                        <h4 className="shot-title">{s.caption}</h4>
-                      </div>
-                      <p className="shot-desc">
-                        {s.detail ? s.detail : "설명(detail)을 추가하면 여기에 표시됩니다."}
-                      </p>
-                    </div>
-                  </article>
-                ))}
-              </div>
+                <div className="shot-body-one">
+                  <div className="shot-topline">
+                    <span className="shot-index">{String(activeIdx + 1).padStart(2, "0")}</span>
+                    <h4 className="shot-title">{screensToShow[activeIdx].caption}</h4>
+                  </div>
 
-              {/* dots */}
+                  <p className="shot-desc">
+                    {screensToShow[activeIdx].detail
+                      ? screensToShow[activeIdx].detail
+                      : "설명(detail)을 추가하면 여기에 표시됩니다."}
+                  </p>
+                </div>
+              </article>
+
+              {/* ✅ 도트: setActiveIdx만 호출하므로 100% 반응 */}
               <div className="shot-dots">
                 {screensToShow.map((_, i) => (
                   <button
                     key={i}
+                    type="button"
                     className={`shot-dot ${i === activeIdx ? "active" : ""}`}
-                    onClick={() => goToIndex(i)}
+                    onClick={() => setActiveIdx(i)}
                     aria-label={`go to slide ${i + 1}`}
                   />
                 ))}
@@ -316,6 +318,7 @@ export default function ProjectDetail() {
             </>
           )}
         </div>
+
 
         {/* Bottom nav */}
         <div className="detail-bottom-nav" style={{ marginTop: 18 }}>

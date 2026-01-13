@@ -205,38 +205,74 @@ export default function ProjectDetail() {
             <div>
               <h3 className="card-title">Screens</h3>
               <p className="muted" style={{ marginTop: 4 }}>
-                화면 캡처 기반으로 사용자 흐름을 정리했습니다.
+                카드 슬라이드로 화면과 설명을 빠르게 확인할 수 있습니다.
               </p>
             </div>
 
-            {myKeywords.length ? (
-              <label className="muted" style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <input
-                  type="checkbox"
-                  checked={onlyMine}
-                  onChange={(e) => setOnlyMine(e.target.checked)}
-                />
-                내 담당 화면만 보기
-              </label>
-            ) : null}
+            <div className="shot-controls">
+              {myKeywords.length ? (
+                <label className="muted shot-toggle">
+                  <input
+                    type="checkbox"
+                    checked={onlyMine}
+                    onChange={(e) => setOnlyMine(e.target.checked)}
+                  />
+                  내 담당만
+                </label>
+              ) : null}
+
+              <button className="btn small ghost" onClick={() => scrollByCard(-1)} aria-label="prev">
+                ←
+              </button>
+              <button className="btn small ghost" onClick={() => scrollByCard(1)} aria-label="next">
+                →
+              </button>
+            </div>
           </div>
 
           {screensToShow.length ? (
-            <div className="screens-grid" style={{ marginTop: 12 }}>
-              {screensToShow.map((s) => (
-                <figure key={s.src} className="screen">
-                  <img src={s.src} alt={s.alt || s.caption || "screen"} loading="lazy" />
-                  <figcaption>
-                    <b>{s.caption}</b>
-                    {s.detail ? <p className="muted">{s.detail}</p> : null}
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
+            <>
+              {/* ✅ 슬라이드 트랙 */}
+              <div className="shot-track" ref={sliderRef}>
+                {screensToShow.map((s, idx) => (
+                  <article className="shot-slide" key={s.src}>
+                    <div className="shot-img">
+                      <img src={s.src} alt={s.alt || s.caption || "screen"} loading="lazy" />
+                    </div>
+
+                    <div className="shot-body">
+                      <div className="shot-topline">
+                        <span className="shot-index">{String(idx + 1).padStart(2, "0")}</span>
+                        <h4 className="shot-title">{s.caption}</h4>
+                      </div>
+
+                      {s.detail ? (
+                        <p className="shot-desc">{s.detail}</p>
+                      ) : (
+                        <p className="shot-desc muted">설명(detail)을 추가하면 여기에 표시됩니다.</p>
+                      )}
+                    </div>
+                  </article>
+                ))}
+              </div>
+
+              {/* ✅ 아래 점(도트) 네비게이션 */}
+              <div className="shot-dots">
+                {screensToShow.map((_, i) => (
+                  <button
+                    key={i}
+                    className="shot-dot"
+                    onClick={() => goToIndex(i)}
+                    aria-label={`go to slide ${i + 1}`}
+                  />
+                ))}
+              </div>
+            </>
           ) : (
             <p className="muted">screens를 추가해 주세요.</p>
           )}
         </div>
+
 
         {/* Bottom nav */}
         <div className="detail-bottom-nav" style={{ marginTop: 18 }}>

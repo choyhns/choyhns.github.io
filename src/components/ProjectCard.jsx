@@ -1,10 +1,15 @@
 export default function ProjectCard({ p }) {
-  const { title, subtitle, tags, period, highlights, links } = p;
+  const { title, subtitle, tags, period, highlights, links, screenshot } = p;
 
   const preview = highlights.slice(0, 2);
 
   return (
     <article className="card">
+      {screenshot ? (
+        <div className="card-thumb">
+          <img src={screenshot} alt={`${title} thumbnail`} loading="lazy" />
+        </div>
+      ) : null}
       <div className="card-top">
         <div>
           <h3 className="card-title">{title}</h3>

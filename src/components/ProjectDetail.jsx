@@ -1,11 +1,35 @@
 // src/components/ProjectDetail.jsx
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { Link, useParams } from "react-router-dom";
 import { projects } from "../data/projects.js";
 
 export default function ProjectDetail() {
   const { slug } = useParams();
   const [onlyMine, setOnlyMine] = useState(false);
+
+  // ✅ slider refs / handlers
+  const sliderRef = useRef(null);
+
+  const scrollByCard = (dir) => {
+    const el = sliderRef.current;
+    if (!el) return;
+
+    const card = el.querySelector(".shot-slide");
+    const w = card ? card.getBoundingClientRect().width : 420;
+
+    el.scrollBy({ left: dir * (w + 16), behavior: "smooth" });
+  };
+
+  const goToIndex = (idx) => {
+    const el = sliderRef.current;
+    if (!el) return;
+
+    const slides = el.querySelectorAll(".shot-slide");
+    const target = slides[idx];
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", inline: "start", block: "nearest" });
+    }
+  };
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -199,7 +223,7 @@ export default function ProjectDetail() {
           )}
         </div>
 
-        {/* Screens */}
+        {/* Screens (Slider) */}
         <div className="card" style={{ marginTop: 18 }}>
           <div className="row-between" style={{ alignItems: "center" }}>
             <div>
@@ -215,7 +239,11 @@ export default function ProjectDetail() {
                   <input
                     type="checkbox"
                     checked={onlyMine}
-                    onChange={(e) => setOnlyMine(e.target.checked)}
+                    onChange={(e) => {
+                      setOnlyMine(e.target.checked);
+                      // 토글 시 첫 카드로 이동(선택)
+                      setTimeout(() => goToIndex(0), 0);
+                    }}
                   />
                   내 담당만
                 </label>
@@ -232,7 +260,6 @@ export default function ProjectDetail() {
 
           {screensToShow.length ? (
             <>
-              {/* ✅ 슬라이드 트랙 */}
               <div className="shot-track" ref={sliderRef}>
                 {screensToShow.map((s, idx) => (
                   <article className="shot-slide" key={s.src}>
@@ -256,7 +283,6 @@ export default function ProjectDetail() {
                 ))}
               </div>
 
-              {/* ✅ 아래 점(도트) 네비게이션 */}
               <div className="shot-dots">
                 {screensToShow.map((_, i) => (
                   <button
@@ -272,7 +298,6 @@ export default function ProjectDetail() {
             <p className="muted">screens를 추가해 주세요.</p>
           )}
         </div>
-
 
         {/* Bottom nav */}
         <div className="detail-bottom-nav" style={{ marginTop: 18 }}>

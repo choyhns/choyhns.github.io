@@ -1,11 +1,13 @@
 // src/data/ProjectImage.js
 
-// 🔹 파일명 앞 숫자 추출 (01_로그인.jpg → 1)
-// ✅ Windows / Mac / Linux 전부 대응
 function extractOrder(path) {
-  const filename = path.split(/[/\\]/).pop() || ""; // ⭐ 핵심 수정
+  const filename = path.split(/[/\\]/).pop() || "";
   const match = filename.match(/^(\d+)/);
   return match ? Number(match[1]) : Number.MAX_SAFE_INTEGER;
+}
+
+function extractFilename(path) {
+  return (path.split(/[/\\]/).pop() || "").toLowerCase();
 }
 
 function toSortedList(mods) {
@@ -14,24 +16,29 @@ function toSortedList(mods) {
       path,
       src: mod.default,
       order: extractOrder(path),
+      name: extractFilename(path),
     }))
-    .sort((a, b) => a.order - b.order)
+    .sort((a, b) => (a.order !== b.order ? a.order - b.order : a.name.localeCompare(b.name, "ko")))
     .map(({ src }) => ({ src }));
 }
 
-// glob
 const barofarmMods = import.meta.glob(
-  "../assets/image/barofarm/*.{png,jpg,jpeg,webp}",
+  "../assets/image/barofarm/*.{png,PNG,jpg,JPG,jpeg,JPEG,webp,WEBP}",
   { eager: true }
 );
 const novafundMods = import.meta.glob(
-  "../assets/image/novafund/*.{PNG,png,jpg,jpeg,webp}",
+  "../assets/image/novafund/*.{png,PNG,jpg,JPG,jpeg,JPEG,webp,WEBP}",
   { eager: true }
 );
 const novatripMods = import.meta.glob(
-  "../assets/image/novatrip/*.{png,jpg,JPG,jpeg,webp}",
+  "../assets/image/novatrip/*.{png,PNG,jpg,JPG,jpeg,JPEG,webp,WEBP}",
   { eager: true }
 );
+
+console.log("barofarm images:", Object.keys(barofarmMods).length);
+console.log("novafund images:", Object.keys(novafundMods).length);
+console.log("novatrip images:", Object.keys(novatripMods).length);
+
 
 export const screensBySlug = {
   barofarm: toSortedList(barofarmMods),

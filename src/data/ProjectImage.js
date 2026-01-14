@@ -1,17 +1,21 @@
 // src/data/ProjectImage.js
 
-// 🔹 숫자 + 한글 + 확장자 섞여도 안전한 정렬
-const byFilename = (a, b) =>
-  a.path.localeCompare(b.path, "ko", { numeric: true, sensitivity: "base" });
+// 🔹 파일명 앞 숫자 추출 (01_로그인.jpg → 1)
+function extractOrder(path) {
+  const filename = path.split("/").pop() || "";
+  const match = filename.match(/^(\d+)/);
+  return match ? Number(match[1]) : Number.MAX_SAFE_INTEGER;
+}
 
 function toSortedList(mods) {
   return Object.entries(mods)
     .map(([path, mod]) => ({
-      path,          // ✅ 원본 파일 경로 (01_로그인.jpg)
+      path,
       src: mod.default,
+      order: extractOrder(path), // ✅ 핵심
     }))
-    .sort(byFilename)
-    .map(({ src }) => ({ src })); // 외부에는 src만 노출
+    .sort((a, b) => a.order - b.order) // ✅ 숫자 기준 정렬
+    .map(({ src }) => ({ src }));
 }
 
 // glob
@@ -28,7 +32,6 @@ const novatripMods = import.meta.glob(
   { eager: true }
 );
 
-// export
 export const screensBySlug = {
   barofarm: toSortedList(barofarmMods),
   novafund: toSortedList(novafundMods),

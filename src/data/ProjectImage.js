@@ -1,9 +1,8 @@
 // src/data/ProjectImage.js
 
 // 🔹 파일명 앞 숫자 추출 (01_로그인.jpg → 1)
-// ✅ Windows / Mac / Linux 전부 대응
 function extractOrder(path) {
-  const filename = path.split(/[/\\]/).pop() || ""; // ⭐ 핵심 수정
+  const filename = path.split("/").pop() || "";
   const match = filename.match(/^(\d+)/);
   return match ? Number(match[1]) : Number.MAX_SAFE_INTEGER;
 }
@@ -13,9 +12,9 @@ function toSortedList(mods) {
     .map(([path, mod]) => ({
       path,
       src: mod.default,
-      order: extractOrder(path),
+      order: extractOrder(path), // ✅ 핵심
     }))
-    .sort((a, b) => a.order - b.order)
+    .sort((a, b) => a.order - b.order) // ✅ 숫자 기준 정렬
     .map(({ src }) => ({ src }));
 }
 

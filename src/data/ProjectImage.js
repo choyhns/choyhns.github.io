@@ -24,11 +24,11 @@ const barofarmMods = import.meta.glob(
   { eager: true }
 );
 const novafundMods = import.meta.glob(
-  "../assets/image/novafund/*.{png,jpg,jpeg,webp}",
+  "../assets/image/novafund/*.{PNG,png,jpg,jpeg,webp}",
   { eager: true }
 );
 const novatripMods = import.meta.glob(
-  "../assets/image/novatrip/*.{png,jpg,jpeg,webp}",
+  "../assets/image/novatrip/*.{png,jpg,JPG,jpeg,webp}",
   { eager: true }
 );
 

@@ -6,7 +6,11 @@ import { screensBySlug } from "./ProjectImage";
 // -----------------------------
 function buildScreens(slug, captions) {
   const imgs = screensBySlug?.[slug] ?? [];
-  return imgs.map((it, i) => ({
+
+  // ✅ 혹시라도 src로 정렬이 필요하면 여기서 한 번 더 정렬(보험)
+  const sorted = [...imgs].sort((a, b) => (a.src || "").localeCompare(b.src || "", "ko"));
+
+  return sorted.map((it, i) => ({
     src: it.src,
     alt: `${slug} screen ${i + 1}`,
     caption: captions?.[i] ?? `Screen ${i + 1}`,
@@ -14,9 +18,12 @@ function buildScreens(slug, captions) {
 }
 
 function applyScreenDetails(screens, detailMap) {
-  // detailMap: { "캡션": "설명" } 또는 부분키워드 매칭을 위해 includes 사용
+  // ✅ 긴 키 우선 매칭 (오매칭 방지)
+  const keys = Object.keys(detailMap).sort((a, b) => b.length - a.length);
+
   return screens.map((s) => {
-    const key = Object.keys(detailMap).find((k) => (s.caption || "").includes(k));
+    const cap = s.caption || "";
+    const key = keys.find((k) => cap.includes(k));
     return key ? { ...s, detail: detailMap[key] } : s;
   });
 }

@@ -229,7 +229,7 @@ export default function ProjectDetail() {
           ) : (
             <p className="muted">features를 추가해 주세요.</p>
           )}
-        </div>
+        </div> 
 
         {/* ✅ Screens (state 기반 1장 슬라이더) */}
         <div className="card" style={{ marginTop: 18 }}>

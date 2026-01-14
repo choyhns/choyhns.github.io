@@ -14,7 +14,7 @@ function buildScreens(slug, captions) {
     src: it.src,
     alt: `${slug} screen ${i + 1}`,
     caption: captions?.[i] ?? `Screen ${i + 1}`,
-  }));
+  }));  
 }
 
 function applyScreenDetails(screens, detailMap) {

@@ -231,6 +231,41 @@ export default function ProjectDetail() {
           )}
         </div> 
 
+        {/* ✅ Troubleshooting */}
+        {project.troubleshooting?.length ? (
+          <div className="card" style={{ marginTop: 18 }}>
+            <h3 className="card-title">Troubleshooting</h3>
+            <p className="muted" style={{ marginTop: 4 }}>
+              프로젝트 진행 중 겪은 문제와 해결 과정입니다.
+            </p>
+
+            <div className="troubleshooting-list" style={{ marginTop: 16 }}>
+              {project.troubleshooting.map((t, idx) => (
+                <div className="troubleshooting-item" key={idx}>
+                  <div className="ts-header">
+                    <span className="ts-badge">Issue {idx + 1}</span>
+                    <h4 className="ts-problem">{t.problem}</h4>
+                  </div>
+                  <div className="ts-body">
+                    <div className="ts-row">
+                      <span className="ts-label">원인</span>
+                      <span className="ts-content">{t.cause}</span>
+                    </div>
+                    <div className="ts-row">
+                      <span className="ts-label">해결</span>
+                      <span className="ts-content">{t.solution}</span>
+                    </div>
+                    <div className="ts-row ts-result">
+                      <span className="ts-label">결과</span>
+                      <span className="ts-content">{t.result}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
         {/* ✅ Screens (state 기반 1장 슬라이더) */}
         <div className="card" style={{ marginTop: 18 }}>
           <div className="row-between" style={{ alignItems: "center" }}>

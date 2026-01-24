@@ -164,6 +164,21 @@ export const projects = [
           desc: "일정 선택과 지도 기반 위치 선택, 조건 입력을 순차적으로 연결해 작성 완료까지의 사용자 경험을 안정적으로 만들었습니다.",
         },
       ],
+
+      troubleshooting: [
+        {
+          problem: "React 무한스크롤 구현 중 동일 page가 반복 요청되는 문제",
+          cause: "setState의 비동기 반영으로 page 업데이트 전에 fetch가 실행되고, 이벤트 핸들러가 이전 page를 참조하며, scroll 이벤트 연속 발생으로 중복 호출 발생",
+          solution: "page 증가와 fetch를 분리(useEffect 기반), setPage(prev => prev + 1) 적용, isLoading/hasMore로 중복 요청 차단",
+          result: "동일 page 반복 요청 제거, 중복 데이터 렌더링 해소, API 부하 감소 및 UX 개선",
+        },
+        {
+          problem: "이미지 업로드 후 로컬에서는 정상 표시되나 팀원/배포 환경에서 이미지가 보이지 않음",
+          cause: "로컬 파일 시스템 경로 기반으로 이미지 경로를 저장하여 다른 환경에서는 해당 파일이 존재하지 않음",
+          solution: "서버 업로드 전용 디렉터리 구성 후 정적 서빙 설정, DB에는 로컬 경로가 아닌 접근 가능한 URL 형태로 이미지 경로 저장",
+          result: "환경에 관계없이 이미지 정상 표시, 파일 업로드/정적 리소스 처리에 대한 이해도 향상",
+        },
+      ],
     };
   })(),
 
@@ -310,6 +325,27 @@ export const projects = [
         {
           title: "운영 기능: 관리자 페이지 + 출금",
           desc: "관리자 페이지와 출금 화면을 구성해 운영 프로세스(관리/정산/출금) 측면의 기능을 포함했습니다.",
+        },
+      ],
+
+      troubleshooting: [
+        {
+          problem: "관리자 페이지 URL 직접 접근 가능 (보안 취약점)",
+          cause: "컨트롤러별 개별 권한 체크로 인한 일관성 없음",
+          solution: "공통 권한 체크 로직으로 접근 제어 통합",
+          result: "보안 취약점 제거",
+        },
+        {
+          problem: "Controller/Service/DAO 역할 구분 불명확 → 비즈니스 로직이 Controller에 몰리면서 코드 복잡화, 수정 시 연쇄 에러 발생",
+          cause: "MVC 패턴의 책임 분리 개념이 명확하지 않음",
+          solution: "Controller는 요청/응답 처리만, Service는 비즈니스 로직, DAO는 DB 접근으로 역할 구분",
+          result: "코드 가독성 향상, 기능 추가/수정 시 영향 범위 감소",
+        },
+        {
+          problem: "펀딩 결제 실패에도 펀딩에 금액이 반영되는 데이터 불일치",
+          cause: "여러 SQL이 트랜잭션 없이 개별 실행, 중간 실패 시 롤백되지 않음",
+          solution: "Service 계층에서 트랜잭션 처리, 결제 성공 시에만 펀딩 금액 업데이트",
+          result: "데이터 정합성 확보, 트랜잭션의 필수성 학습",
         },
       ],
     };
@@ -507,6 +543,21 @@ export const projects = [
         {
           title: "판매자 페이지(대시보드/관리 화면)",
           desc: "판매자 대시보드 및 판매자 관리 화면의 구조를 구성해 판매자 운영 경험을 제공했습니다.",
+        },
+      ],
+
+      troubleshooting: [
+        {
+          problem: "판매자 페이지에서 상품목록 조회 시, 상품마다 판매자/카테고리 정보를 개별 조회 → 데이터 증가에 따라 쿼리 호출 횟수 급증 (N+1 문제)",
+          cause: "연관된 엔티티를 Lazy Loading 방식으로 조회하면서 리스트 조회 후 항목별 추가 쿼리가 반복 실행됨",
+          solution: "목록 조회 시 필요한 연관 데이터를 JOIN 기반 쿼리로 한 번에 조회, 리스트 화면에 필요한 최소 데이터만 조회하도록 응답 구조 재설계",
+          result: "쿼리 호출 횟수 감소 및 API 응답 속도 개선, 대용량 데이터에서도 안정적인 목록 조회 구현",
+        },
+        {
+          problem: "React → Spring Boot API 요청 시 브라우저에서 CORS 에러 발생",
+          cause: "React에서 API 요청 시 CORS 에러로 인해 응답 차단",
+          solution: "Spring Security 설정에서 CORS 허용 정책을 명시적으로 설정, 허용 Origin/HTTP Method/Header를 지정하여 프론트엔드 요청 허용",
+          result: "프론트엔드-백엔드 간 API 통신 정상화, 브라우저 보안 정책과 Spring Security 필터 체인 구조에 대한 이해도 향상",
         },
       ],
     };

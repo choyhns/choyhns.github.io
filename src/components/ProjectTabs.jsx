@@ -55,18 +55,16 @@ export default function ProjectTabs() {
             ))}
           </ul>
 
-          <div className="card-actions">
-            {/* ✅ 상세 페이지로 이동 */}
+          <div className="card-actions" style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
             <Link className="btn small" to={`/project/${current.slug}`}>
               Detail
             </Link>
-
-            {current.links.repo ? (
+            {current.links?.repo ? (
               <a className="btn small ghost" href={current.links.repo} target="_blank" rel="noreferrer">
-                Repo
+                Repo로 이동 →
               </a>
             ) : null}
-            {current.links.demo ? (
+            {current.links?.demo ? (
               <a className="btn small ghost" href={current.links.demo} target="_blank" rel="noreferrer">
                 Demo
               </a>

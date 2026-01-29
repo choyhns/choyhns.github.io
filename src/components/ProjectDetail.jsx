@@ -96,27 +96,25 @@ export default function ProjectDetail() {
   return (
     <section className="section project-detail">
       <div className="container">
-        {/* Top bar */}
-        <div className="detail-topbar">
+        {/* Top nav */}
+        <div
+          className="detail-nav-bar"
+          style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", marginBottom: 18 }}
+        >
           <Link className="btn ghost" to="/#projects">
             ← Projects
           </Link>
-
-          <div className="detail-nav">
+          <div style={{ display: "flex", gap: 12 }}>
             {nav.prev ? (
               <Link className="btn small ghost" to={`/project/${nav.prev.slug}`}>
                 ← {nav.prev.title}
               </Link>
-            ) : (
-              <span />
-            )}
+            ) : null}
             {nav.next ? (
               <Link className="btn small ghost" to={`/project/${nav.next.slug}`}>
                 {nav.next.title} →
               </Link>
-            ) : (
-              <span />
-            )}
+            ) : null}
           </div>
         </div>
 
@@ -161,10 +159,10 @@ export default function ProjectDetail() {
           </div>
 
           {hasLinks ? (
-            <div className="card-actions" style={{ marginTop: 12 }}>
+            <div className="card-actions" style={{ marginTop: 12, display: "flex", gap: 14, flexWrap: "wrap" }}>
               {links.repo ? (
                 <a className="btn small" href={links.repo} target="_blank" rel="noreferrer">
-                  Repo
+                  Repo로 이동 →
                 </a>
               ) : null}
               {links.demo ? (
@@ -356,19 +354,22 @@ export default function ProjectDetail() {
 
 
         {/* Bottom nav */}
-        <div className="detail-bottom-nav" style={{ marginTop: 18 }}>
+        <div
+          className="detail-nav-bar"
+          style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", marginTop: 18 }}
+        >
           <Link className="btn ghost" to="/#projects">
-            ← 목록으로
+            ← Projects
           </Link>
-          <div className="detail-nav">
+          <div style={{ display: "flex", gap: 12 }}>
             {nav.prev ? (
               <Link className="btn small ghost" to={`/project/${nav.prev.slug}`}>
                 ← {nav.prev.title}
               </Link>
             ) : null}
             {nav.next ? (
-              <Link className="btn small" to={`/project/${nav.next.slug}`}>
-                Next: {nav.next.title} →
+              <Link className="btn small ghost" to={`/project/${nav.next.slug}`}>
+                {nav.next.title} →
               </Link>
             ) : null}
           </div>

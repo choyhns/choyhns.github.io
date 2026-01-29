@@ -132,7 +132,7 @@ export const projects = [
       screenshot: screensBySlug.novatrip?.[0]?.src || "",
       stack: ["Node.js", "React", "MongoDB", "Maps API"],
       tags: ["Community", "Multi-step Form", "Map"],
-      links: { repo: "", demo: "", docs: "" },
+      links: { repo: "https://github.com/choyhns/novatrip", demo: "", docs: "" },
 
       // ✅ 담당 키워드(상세에서 ‘내 담당 화면만 보기’ 토글 활성화)
       myScreensKeywords,
@@ -285,7 +285,7 @@ export const projects = [
       screenshot: screensBySlug.novafund?.[0]?.src || "",
       stack: ["Java", "Spring MVC", "JSP", "Oracle"],
       tags: ["Auth", "Cash", "Admin", "Funding"],
-      links: { repo: "", demo: "", docs: "" },
+      links: { repo: "https://github.com/choyhns/novafund", demo: "", docs: "" },
 
       myScreensKeywords,
 
@@ -511,7 +511,7 @@ export const projects = [
       screenshot: screensBySlug.barofarm?.[0]?.src || "",
       stack: ["Spring Boot", "React", "Oracle"],
       tags: ["E-commerce", "Seller", "Mypage"],
-      links: { repo: "", demo: "", docs: "" },
+      links: { repo: "https://github.com/choyhns/barofarm", demo: "", docs: "" },
 
       myScreensKeywords,
 

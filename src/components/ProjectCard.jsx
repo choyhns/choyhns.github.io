@@ -41,17 +41,17 @@ export default function ProjectCard({ p }) {
           </Link>
         ) : null}
         {links?.repo ? (
-          <a className="btn small ghost" href={links.repo} target="_blank" rel="noreferrer">
+          <a className="btn small ghost" style={{gap: 8}} href={links.repo} target="_blank" rel="noreferrer">
             Repo로 이동
           </a>
         ) : null}
         {links?.demo ? (
-          <a className="btn small ghost" href={links.demo} target="_blank" rel="noreferrer">
+          <a className="btn small ghost" style={{gap: 8}} href={links.demo} target="_blank" rel="noreferrer">
             Demo
           </a>
         ) : null}
         {links?.docs ? (
-          <a className="btn small ghost" href={links.docs} target="_blank" rel="noreferrer">
+          <a className="btn small ghost" style={{gap: 8}} href={links.docs} target="_blank" rel="noreferrer">
             Docs
           </a>
         ) : null}

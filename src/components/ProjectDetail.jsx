@@ -196,7 +196,7 @@ export default function ProjectDetail() {
             )}
           </div>
 
-          <div className="card">
+          <div className="card" style={{marginTop: 18}}>
             <h3 className="card-title">Highlights</h3>
             {project.highlights?.length ? (
               <ul className="bullets">

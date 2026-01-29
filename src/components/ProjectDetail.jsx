@@ -182,7 +182,7 @@ export default function ProjectDetail() {
         </div>
 
         {/* Overview / Highlights */}
-        <div className="grid-2" style={{ marginTop: 18 }}>
+        <div className="grid-2" style={{ marginTop: 28, marginBottom: 28 }}>
           <div className="card">
             <h3 className="card-title">Overview</h3>
             {project.summary?.length ? (

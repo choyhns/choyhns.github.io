@@ -1,5 +1,7 @@
+import { Link } from "react-router-dom";
+
 export default function ProjectCard({ p }) {
-  const { title, subtitle, tags, period, highlights, links, screenshot } = p;
+  const { title, subtitle, tags, period, highlights, links, screenshot, slug } = p;
 
   const preview = highlights.slice(0, 2);
 
@@ -32,18 +34,23 @@ export default function ProjectCard({ p }) {
         ))}
       </ul>
 
-      <div className="card-actions">
-        {links.repo ? (
-          <a className="btn small" href={links.repo} target="_blank" rel="noreferrer">
-            Repo
+      <div className="card-actions" style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+        {slug ? (
+          <Link className="btn small" to={`/project/${slug}`}>
+            Detail
+          </Link>
+        ) : null}
+        {links?.repo ? (
+          <a className="btn small ghost" href={links.repo} target="_blank" rel="noreferrer">
+            Repo로 이동
           </a>
         ) : null}
-        {links.demo ? (
+        {links?.demo ? (
           <a className="btn small ghost" href={links.demo} target="_blank" rel="noreferrer">
             Demo
           </a>
         ) : null}
-        {links.docs ? (
+        {links?.docs ? (
           <a className="btn small ghost" href={links.docs} target="_blank" rel="noreferrer">
             Docs
           </a>
